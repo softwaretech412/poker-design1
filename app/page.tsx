@@ -26,12 +26,47 @@ const LOGO = '/assets/logo.png'
 function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState<string>('#')
   const scrollYRef = useRef(0)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const sections = [
+      { id: '#', element: document.body },
+      { id: '#about', element: document.getElementById('about') },
+      { id: '#gallery', element: document.getElementById('gallery') },
+      { id: '#faq', element: document.getElementById('faq') },
+      { id: '#contact', element: document.getElementById('contact') },
+    ].filter((s): s is { id: string; element: HTMLElement } => !!s.element) as {
+      id: string
+      element: HTMLElement
+    }[]
+
+    if (!sections.length) return
+
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + 100
+      let currentId = '#'
+
+      for (const { id, element } of sections) {
+        const rect = element.getBoundingClientRect()
+        const top = rect.top + window.scrollY
+        if (scrollPos >= top) {
+          currentId = id
+        }
+      }
+
+      setActiveSection(currentId)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   useEffect(() => {
@@ -66,6 +101,7 @@ function Header() {
     { href: '#', label: 'HOME' },
     { href: '#about', label: 'ABOUT US' },
     { href: '#gallery', label: 'GALLERY' },
+    { href: '#faq', label: 'FAQ' },
     { href: '#contact', label: 'CONTACT' },
   ]
 
@@ -83,13 +119,33 @@ function Header() {
       </button>
       <nav className="header-nav" aria-label="Main">
         {navLinks.map(({ href, label }) => (
-          <a key={label} href={href} onClick={closeMenu}>{label}</a>
+          <a
+            key={label}
+            href={href}
+            onClick={() => {
+              setActiveSection(href)
+              closeMenu()
+            }}
+            className={`header-nav-link ${activeSection === href ? 'is-active' : ''}`}
+          >
+            {label}
+          </a>
         ))}
       </nav>
       <div className={`header-overlay ${menuOpen ? 'open' : ''}`} aria-hidden={!menuOpen} onClick={closeMenu}>
         <nav className="header-overlay-nav" aria-label="Mobile" onClick={(e) => e.stopPropagation()}>
           {navLinks.map(({ href, label }) => (
-            <a key={label} href={href} onClick={closeMenu}>{label}</a>
+            <a
+              key={label}
+              href={href}
+              onClick={() => {
+                setActiveSection(href)
+                closeMenu()
+              }}
+              className={`header-nav-link ${activeSection === href ? 'is-active' : ''}`}
+            >
+              {label}
+            </a>
           ))}
         </nav>
       </div>
@@ -120,8 +176,21 @@ function TopVideo() {
         <source src={TOP_VIDEO} type="video/quicktime" />
       </video>
       <div className="top-video-overlay">
-        <img src={LOGO} alt="Boston Jimmy" className="top-video-logo" />
-        <a href="#contact" className="top-video-cta top-video-cta--table">JOIN AN GAME</a>
+        <div className="top-video-content">
+          <p className="top-video-kicker">INVITE-ONLY</p>
+          <h1 className="top-video-heading">
+            HIGH STAKES CASH
+            <br />
+            GAMES IN LAS VEGAS
+          </h1>
+          <p className="top-video-subcopy">
+            A fun, well-run poker game for business players, celebrities, and high-stakes recreational action.
+          </p>
+          <div className="top-video-cta-row">
+            <a href="#contact" className="top-video-cta">JOIN THE GAME</a>
+            <a href="#contact" className="top-video-cta top-video-cta--secondary">REQUEST AN INVITE</a>
+          </div>
+        </div>
       </div>
     </section>
   )
@@ -511,30 +580,14 @@ function ContactSection() {
 }
 
 function Newsletter() {
-  const [email, setEmail] = useState('')
-  const [agree, setAgree] = useState(false)
   return (
     <div className="footer-newsletter">
-      <h4>NEWSLETTER</h4>
-      <p>Sign up for our newsletter to stay up to date on the next journey.</p>
-      <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          aria-label="Email"
-        />
-        <label className="newsletter-checkbox">
-          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-          I agree to receiving marketing emails and special deals
-        </label>
-      </form>
+      <h4>SUPPORT</h4>
+      <p>Gmail: <a href="mailto:jimmysleiman7@gmail.com">jimmysleiman7@gmail.com</a></p>
+      <p>IG: <a href="https://instagram.com/BostonJimmyy" target="_blank" rel="noreferrer">BostonJimmyy</a></p>
     </div>
   )
 }
-
-const PAYMENT_ICONS = ['American Express', 'Apple Pay', 'Diners Club', 'Discover', 'Google Pay', 'Mastercard', 'PayPal', 'Shop Pay', 'Visa']
 
 function Footer() {
   return (
@@ -544,12 +597,12 @@ function Footer() {
           <div className="footer-col">
             <h4>ABOUT</h4>
             <a href="#about">About</a>
-            <a href="#about">Our Story</a>
+            <a href="#story">Our Story</a>
             <a href="#making">The Making Of</a>
           </div>
           <div className="footer-col">
             <h4>CUSTOMER SERVICE</h4>
-            <a href="#">FAQ</a>
+            <a href="#faq">FAQ</a>
             <a href="#">Returns & Exchange Policy</a>
             <a href="#">Track a Shipment</a>
             <a href="#">Return Request</a>
@@ -562,12 +615,7 @@ function Footer() {
           </div>
           <Newsletter />
         </div>
-        <div className="footer-payments">
-          {PAYMENT_ICONS.map((name) => (
-            <span key={name} className="payment-badge" title={name}>{name}</span>
-          ))}
-        </div>
-        <p className="footer-copy">© 2026 Andrew Morgan, Andrew Morgan LLC All rights reserved.</p>
+        <p className="footer-copy">© 2026 Elite Poker. All rights reserved.</p>
       </div>
     </footer>
   )
@@ -577,11 +625,102 @@ function AboutUsSection() {
   return (
     <section id="about" className="promo-block">
       <div className="promo-inner">
-        <h2 className="promo-title">About Us</h2>
+        <h2 className="promo-title">WHAT THIS GAME IS</h2>
         <p className="promo-text">
-          Boston Jimmy brings together players who appreciate the highest stakes and the finest tables. We run private games where skill, nerve, and camaraderie meet—elevated and never ordinary. Whether you&apos;re in Vegas or planning your next trip, we craft experiences that set a new standard in high-stakes play.
+          <strong>This is an invite-only high-stakes cash game hosted in Las Vegas.</strong>
         </p>
-        <div className="promo-logo">BOSTON JIMMY</div>
+        <p className="promo-text">The focus is simple:</p>
+        <p className="promo-text">Great action, good people, and a smooth, comfortable experience.</p>
+        <p className="promo-text">
+          The game is professionally run and intentionally curated so everyone knows what they&apos;re sitting in and can just enjoy playing poker.
+        </p>
+        <p className="promo-text">No chaos.</p>
+        <p className="promo-text">No awkward moments.</p>
+        <div className="promo-footer">
+          <div className="promo-logo">
+            Just a great game in a relaxed setting
+          </div>
+          <a href="#contact" className="top-video-cta">APPLY NOW</a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const FAQ_DATA = [
+  {
+    question: 'What are the stakes?',
+    answer: 'We play NLH 25/50/100, Minimum buy in is $10000, No maximum buy in',
+  },
+  {
+    question: 'When do you play?',
+    answer: 'We play Wednesday to Sunday, 4pm start till the early morning hours, During WSOP and WPT we play every single day non stop, On average last few years the game has ran around 260 days a year',
+  },
+  {
+    question: 'What makes us unique?',
+    answer: "We clearly identify who the professionals are and who the recreational players are, so everyone knows exactly what game they're sitting in. Lineups are intentionally curated for balance, action, and enjoyment not chaos. The game runs inside the high-stakes area at the Wynn Las Vegas, offering a luxury environment, professional management, and consistent structure. This isn't a random table or a free-for-all. It's a controlled, high-quality poker experience built for players who value fairness, comfort, and real action.",
+  },
+  {
+    question: 'How do I become a member?',
+    answer: 'Getting started is easy! Simply fill out our contact form below, and our team will reach out to you with membership details, location information, and upcoming game schedules.',
+  },
+  {
+    question: 'Do you provide training for new players?',
+    answer: 'Yes! We offer beginner sessions and coaching programs to help new players learn the fundamentals of poker in a friendly, non-intimidating environment.',
+  },
+] as const
+
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0)
+
+  return (
+    <section id="faq" className="faq-section">
+      <div className="faq-bg" aria-hidden="true" />
+      <div className="faq-inner">
+        <h2 className="faq-title">FAQS FOR YOUR GAME QUESTIONS</h2>
+        <p className="faq-subtitle">
+          Contact us at{' '}
+          <a href="mailto:jimmysleiman7@gmail.com" className="faq-email">jimmysleiman7@gmail.com</a>
+          {' '}for any questions.
+        </p>
+        <div className="faq-list">
+          {FAQ_DATA.map((item, index) => {
+            const isOpen = openIndex === index
+            return (
+              <div
+                key={index}
+                className={`faq-item ${isOpen ? 'faq-item--open' : ''}`}
+              >
+                <button
+                  type="button"
+                  className="faq-question-wrap"
+                  onClick={() => setOpenIndex(isOpen ? null : index)}
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${index}`}
+                  id={`faq-question-${index}`}
+                >
+                  <span className="faq-question">{item.question}</span>
+                  <span className="faq-icon" aria-hidden="true">
+                    {isOpen ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                    )}
+                  </span>
+                </button>
+                <div
+                  id={`faq-answer-${index}`}
+                  role="region"
+                  aria-labelledby={`faq-question-${index}`}
+                  aria-hidden={!isOpen}
+                  className={`faq-answer-wrap ${isOpen ? 'faq-answer-wrap--open' : ''}`}
+                >
+                  <p className="faq-answer">{item.answer}</p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
@@ -612,11 +751,13 @@ export default function Home() {
           <div className="section-inner">
             <h2 className="section-title">Our Story</h2>
             <p className="section-text">
-              The Poker brings the thrill of professional poker to dedicated players
-              across the World. We provide a premium, secure, and exciting environment for live poker games.
+              This is an invite-only high-stakes cash game hosted in Las Vegas, built around deep stacks,
+              consistent lineups, and a professional environment. The game runs regularly and attracts experienced players, 
+              business professionals, and international action looking for real stakes and real poker.
             </p>
           </div>
         </section>
+        <FAQSection />
         <ContactSection />
         <ClosingBanner />
       </main>
