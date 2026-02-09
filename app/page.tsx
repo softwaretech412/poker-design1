@@ -197,7 +197,6 @@ function TopVideo() {
             A fun, well-run poker game for business players, celebrities, and high-stakes recreational action.
           </p>
           <div className="top-video-cta-row">
-            <a href="#contact" className="top-video-cta">JOIN THE GAME</a>
             <a href="#contact" className="top-video-cta top-video-cta--secondary">REQUEST AN INVITE</a>
           </div>
         </div>
@@ -608,19 +607,14 @@ function Footer() {
             <h4>ABOUT</h4>
             <a href="#about">About</a>
             <a href="#story">Our Story</a>
-            <a href="#making">The Making Of</a>
           </div>
           <div className="footer-col">
             <h4>CUSTOMER SERVICE</h4>
             <a href="#faq">FAQ</a>
-            <a href="#">Returns & Exchange Policy</a>
-            <a href="#">Track a Shipment</a>
-            <a href="#">Return Request</a>
           </div>
           <div className="footer-col">
             <h4>CONNECT</h4>
             <a href="#instagram">Instagram</a>
-            <a href="#">Press Inquiries</a>
             <a href="#contact">Contact</a>
           </div>
           <Newsletter />
@@ -670,18 +664,11 @@ const FAQ_DATA = [
     question: 'What makes us unique?',
     answer: "We clearly identify who the professionals are and who the recreational players are, so everyone knows exactly what game they're sitting in. Lineups are intentionally curated for balance, action, and enjoyment not chaos. The game runs inside the high-stakes area at the Wynn Las Vegas, offering a luxury environment, professional management, and consistent structure. This isn't a random table or a free-for-all. It's a controlled, high-quality poker experience built for players who value fairness, comfort, and real action.",
   },
-  {
-    question: 'How do I become a member?',
-    answer: 'Getting started is easy! Simply fill out our contact form below, and our team will reach out to you with membership details, location information, and upcoming game schedules.',
-  },
-  {
-    question: 'Do you provide training for new players?',
-    answer: 'Yes! We offer beginner sessions and coaching programs to help new players learn the fundamentals of poker in a friendly, non-intimidating environment.',
-  },
+
 ] as const
 
 function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [openIndex, setOpenIndex] = useState<number | null>(-1)
 
   return (
     <section id="faq" className="faq-section">
