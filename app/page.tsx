@@ -609,17 +609,13 @@ function Footer() {
             <a href="#story">Our Story</a>
           </div>
           <div className="footer-col">
-            <h4>CUSTOMER SERVICE</h4>
-            <a href="#faq">FAQ</a>
-          </div>
-          <div className="footer-col">
             <h4>CONNECT</h4>
             <a href="#instagram">Instagram</a>
             <a href="#contact">Contact</a>
           </div>
           <Newsletter />
         </div>
-        <p className="footer-copy">© 2026 Elite Poker. All rights reserved.</p>
+        <p className="footer-copy">© 2026 boston jimmy. All rights reserved.</p>
       </div>
     </footer>
   )
@@ -629,22 +625,24 @@ function AboutUsSection() {
   return (
     <section id="about" className="promo-block">
       <div className="promo-inner">
-        <h2 className="promo-title">WHAT THIS GAME IS</h2>
+        <h2 className="promo-title">ABOUT THE GAME</h2>
         <p className="promo-text">
-          <strong>This is an invite-only high-stakes cash game hosted in Las Vegas.</strong>
+          This is a private, curated high-stakes cash game in Las Vegas.
         </p>
         <p className="promo-text">The focus is simple:</p>
-        <p className="promo-text">Great action, good people, and a smooth, comfortable experience.</p>
-        <p className="promo-text">
-          The game is professionally run and intentionally curated so everyone knows what they&apos;re sitting in and can just enjoy playing poker.
-        </p>
+        <p className="promo-text">clean lineups, real action, and a professional environment.</p>
+        <p className="promo-text">Every player is vetted.</p>
+        <p className="promo-text">Every seat serves the game.</p>
+        <p className="promo-text">There are no surprises at the table.</p>
         <p className="promo-text">No chaos.</p>
-        <p className="promo-text">No awkward moments.</p>
+        <p className="promo-text">No uncomfortable situations.</p>
+        <p className="promo-text">No wasted time.</p>
+        <p className="promo-text">
+          Just a controlled, high-quality game for players who take poker seriously.
+        </p>
+        <p className="promo-text">Apply below if you belong in this room.</p>
         <div className="promo-footer">
-          <div className="promo-logo">
-            Just a great game in a relaxed setting
-          </div>
-          <a href="#contact" className="top-video-cta">APPLY NOW</a>
+          <a href="#contact" className="top-video-cta cta-dark">APPLY NOW</a>
         </div>
       </div>
     </section>
