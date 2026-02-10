@@ -18,10 +18,8 @@ const SLIDER_IMAGES = [
 const SPLIT_LEFT = '/assets/images/imgi_46_0C3A1325-scaled.jpg'
 const SPLIT_RIGHT = '/assets/images/imgi_51_IMG_4642.jpg'
 const TWO_COL_UPPER = ['/assets/images/imgi_56_IMG_4639.jpg', '/assets/images/imgi_61_IMG_4637.jpg']
-const FULL_WIDTH = '/assets/images/imgi_1_0C3A1303-2-scaled.jpg'
 const TWO_COL_LOWER = ['/assets/images/imgi_80_IMG_4648.jpg', '/assets/images/imgi_84_IMG_4647.jpg']
 const PORTRAIT_SECTION = '/assets/images/footer.webp'
-const LOGO = '/assets/logo.png'
 const INSTAGRAM_HANDLE = 'BostonJimmyy'
 const INSTAGRAM_URL = `https://instagram.com/${INSTAGRAM_HANDLE}`
 const INSTAGRAM_FEED_IMAGES = [
@@ -163,28 +161,12 @@ function Header() {
   )
 }
 
-const VIDEO_START_DELAY_MS = 1500
+const TOP_HERO_IMAGE = '/assets/images/imgi_1_0C3A1303-2-scaled.jpg'
 
 function TopVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [startPlayback, setStartPlayback] = useState(false)
-
-  useEffect(() => {
-    const t = setTimeout(() => setStartPlayback(true), VIDEO_START_DELAY_MS)
-    return () => clearTimeout(t)
-  }, [])
-
-  useEffect(() => {
-    if (!startPlayback || !videoRef.current) return
-    videoRef.current.play().catch(() => { })
-  }, [startPlayback])
-
   return (
     <section className="top-video">
-      <video ref={videoRef} muted loop playsInline autoPlay={startPlayback}>
-        <source src={TOP_VIDEO} type="video/mp4" />
-        <source src={TOP_VIDEO} type="video/quicktime" />
-      </video>
+      <img src={TOP_HERO_IMAGE} alt="" />
       <div className="top-video-overlay">
         <div className="top-video-content">
           <p className="top-video-kicker">INVITE-ONLY</p>
@@ -388,10 +370,39 @@ function TwoColumn({ images, showCta = true }: { images: string[]; showCta?: boo
   )
 }
 
-function FullWidthImage() {
+function FirstImageVideo() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {})
+          } else {
+            video.pause()
+          }
+        })
+      },
+      { threshold: 0.25 }
+    )
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section className="full-width-block">
-      <img src={FULL_WIDTH} alt="" loading="lazy" />
+    <section className="split-video-section full-width-video-section">
+      <video
+        ref={videoRef}
+        className="split-video"
+        src={TOP_VIDEO}
+        muted
+        loop
+        playsInline
+        aria-label="High stakes cash games in Las Vegas"
+      />
     </section>
   )
 }
@@ -914,7 +925,7 @@ export default function Home() {
         <ImageSlider />
         <SplitVideo />
         <TwoColumn images={TWO_COL_UPPER} showCta={false} />
-        <FullWidthImage />
+        <FirstImageVideo />
         <TwoColumn images={TWO_COL_LOWER} showCta={false} />
         <InteriorShot />
         <section id="story" className="section section-dark">

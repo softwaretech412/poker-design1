@@ -379,7 +379,8 @@ body {
     max-height: 100vh;
   }
 
-  .top-video video {
+  .top-video video,
+  .top-video img {
     min-height: 60vh;
     height: 100vh;
   }
@@ -477,7 +478,8 @@ body {
   min-height: 100vh;
 }
 
-.top-video video {
+.top-video video,
+.top-video img {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
@@ -611,6 +613,10 @@ body {
 }
 
 @media (max-width: 768px) {
+  .top-video img {
+    object-position:76% 40%;
+  }
+
   .top-video-overlay {
     justify-content: flex-start;
     align-items: flex-end;
