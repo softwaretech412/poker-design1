@@ -31,7 +31,17 @@ const INSTAGRAM_FEED_IMAGES = [
   '/assets/images/imgi_98_IMG_4646.jpg',
 ]
 
-function Header() {
+const HEADER_TICKER_ITEMS = [
+  'INVITE-ONLY',
+  'HIGH STAKES CASH GAMES IN LAS VEGAS',
+  'A fun, well-run poker game for business players, celebrities, and high-stakes recreational action.',
+]
+
+type HeaderProps = {
+  showLogo?: boolean
+}
+
+function Header({ showLogo = true }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<string>('#')
@@ -115,31 +125,49 @@ function Header() {
 
   return (
     <header className={`site-header ${scrolled ? 'scrolled' : ''}`}>
-      <a href="#" className="header-brand">Boston Jimmy</a>
-      <button
-        type="button"
-        className="header-menu-btn"
-        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-        aria-expanded={menuOpen}
-        onClick={() => setMenuOpen((o) => !o)}
-      >
-        <span className="header-menu-icon">{menuOpen ? '✕' : '☰'}</span>
-      </button>
-      <nav className="header-nav" aria-label="Main">
-        {navLinks.map(({ href, label }) => (
-          <a
-            key={label}
-            href={href}
-            onClick={() => {
-              setActiveSection(href)
-              closeMenu()
-            }}
-            className={`header-nav-link ${activeSection === href ? 'is-active' : ''}`}
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
+      <div className={`header-ticker ${!scrolled ? 'header-ticker--visible' : ''}`}>
+        <div className="header-ticker-inner">
+          <div className="header-ticker-track">
+            {[...HEADER_TICKER_ITEMS, ...HEADER_TICKER_ITEMS].map((text, index) => (
+              <span key={index} className="header-ticker-item">
+                {text}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="header-main">
+        <a
+          href="#"
+          className={`header-brand ${showLogo ? 'header-brand--visible' : 'header-brand--hidden'}`}
+        >
+          Boston Jimmy
+        </a>
+        <button
+          type="button"
+          className="header-menu-btn"
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          <span className="header-menu-icon">{menuOpen ? '✕' : '☰'}</span>
+        </button>
+        <nav className="header-nav" aria-label="Main">
+          {navLinks.map(({ href, label }) => (
+            <a
+              key={label}
+              href={href}
+              onClick={() => {
+                setActiveSection(href)
+                closeMenu()
+              }}
+              className={`header-nav-link ${activeSection === href ? 'is-active' : ''}`}
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+      </div>
       <div className={`header-overlay ${menuOpen ? 'open' : ''}`} aria-hidden={!menuOpen} onClick={closeMenu}>
         <nav className="header-overlay-nav" aria-label="Mobile" onClick={(e) => e.stopPropagation()}>
           {navLinks.map(({ href, label }) => (
@@ -161,27 +189,58 @@ function Header() {
   )
 }
 
-const TOP_HERO_IMAGE = '/assets/images/imgi_1_0C3A1303-2-scaled.jpg'
+const HERO_VIDEO = '/assets/videos/hero.mov'
+const HERO_VIDEO_MOBILE = '/assets/videos/hero1.mov'
+const MOBILE_BREAKPOINT = 768
 
-function TopVideo() {
+type TopVideoProps = {
+  sectionRef: React.RefObject<HTMLElement | null>
+}
+
+function TopVideo({ sectionRef }: TopVideoProps) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)
+    const handler = () => setIsMobile(mq.matches)
+    handler()
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {})
+          } else {
+            video.pause()
+          }
+        })
+      },
+      { threshold: 0.25 }
+    )
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section className="top-video">
-      <img src={TOP_HERO_IMAGE} alt="" />
-      <div className="top-video-overlay">
-        <div className="top-video-content">
-          <p className="top-video-kicker">INVITE-ONLY</p>
-          <h1 className="top-video-heading">
-            HIGH STAKES CASH
-            <br />
-            GAMES IN LAS VEGAS
-          </h1>
-          <p className="top-video-subcopy">
-            A fun, well-run poker game for business players, celebrities, and high-stakes recreational action.
-          </p>
-          <div className="top-video-cta-row">
-            <a href="#contact" className="top-video-cta top-video-cta--secondary">REQUEST AN INVITE</a>
-          </div>
-        </div>
+    <section ref={sectionRef} className="top-video">
+      <video
+        ref={videoRef}
+        src={isMobile ? HERO_VIDEO_MOBILE : HERO_VIDEO}
+        muted
+        loop
+        playsInline
+        autoPlay
+        aria-label="Hero"
+      />
+      <div className="top-video-cta-bottom">
+        <a href="#contact" className="top-video-cta top-video-cta--secondary">REQUEST AN INVITE</a>
       </div>
     </section>
   )
@@ -916,11 +975,40 @@ function ClosingBanner() {
 }
 
 export default function Home() {
+  const heroSectionRef = useRef<HTMLElement | null>(null)
+  const [heroVisible, setHeroVisible] = useState(true)
+  const [hasScrolled, setHasScrolled] = useState(false)
+
+  useEffect(() => {
+    const el = heroSectionRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        setHeroVisible(entry?.isIntersecting ?? false)
+      },
+      { threshold: 0.2 }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setHasScrolled(window.scrollY > 10)
+    }
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
     <>
-      <Header />
+      <Header showLogo={hasScrolled || !heroVisible} />
       <main>
-        <TopVideo />
+        <TopVideo sectionRef={heroSectionRef} />
         <AboutUsSection />
         <ImageSlider />
         <SplitVideo />
