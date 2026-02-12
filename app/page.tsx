@@ -20,16 +20,6 @@ const SPLIT_RIGHT = '/assets/images/imgi_51_IMG_4642.jpg'
 const TWO_COL_UPPER = ['/assets/images/imgi_56_IMG_4639.jpg', '/assets/images/imgi_61_IMG_4637.jpg']
 const TWO_COL_LOWER = ['/assets/images/imgi_80_IMG_4648.jpg', '/assets/images/imgi_84_IMG_4647.jpg']
 const PORTRAIT_SECTION = '/assets/images/footer.webp'
-const INSTAGRAM_HANDLE = 'BostonJimmyy'
-const INSTAGRAM_URL = `https://instagram.com/${INSTAGRAM_HANDLE}`
-const INSTAGRAM_FEED_IMAGES = [
-  '/assets/images/0C3A1338.jpeg',
-  '/assets/images/imgi_69_R6II0769-1365x2048.jpg',
-  '/assets/images/imgi_75_IMG_4640.jpg',
-  '/assets/images/imgi_89_IMG_4636.jpg',
-  '/assets/images/imgi_93_IMG_4650.jpg',
-  '/assets/images/imgi_98_IMG_4646.jpg',
-]
 
 const HEADER_TICKER_ITEMS = [
   'INVITE-ONLY',
@@ -680,7 +670,6 @@ function Footer() {
           </div>
           <div className="footer-col">
             <h4>CONNECT</h4>
-            <a href="#instagram">Instagram</a>
             <a href="#contact">Contact</a>
           </div>
           <Newsletter />
@@ -791,189 +780,6 @@ function FAQSection() {
   )
 }
 
-function InstagramFeedSection() {
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxIndex, setLightboxIndex] = useState(0)
-  const dragStartXRef = useRef(0)
-  const dragDeltaRef = useRef(0)
-  const justDraggedRef = useRef(false)
-
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index)
-    setLightboxOpen(true)
-  }
-
-  const closeLightbox = () => {
-    if (justDraggedRef.current) return
-    setLightboxOpen(false)
-  }
-
-  const goPrev = () => {
-    setLightboxIndex((i) => (i <= 0 ? INSTAGRAM_FEED_IMAGES.length - 1 : i - 1))
-  }
-
-  const goNext = () => {
-    setLightboxIndex((i) => (i >= INSTAGRAM_FEED_IMAGES.length - 1 ? 0 : i + 1))
-  }
-
-  useEffect(() => {
-    if (!lightboxOpen) return
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeLightbox()
-      if (e.key === 'ArrowLeft') goPrev()
-      if (e.key === 'ArrowRight') goNext()
-    }
-    document.addEventListener('keydown', onKeyDown)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = ''
-    }
-  }, [lightboxOpen])
-
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-    dragStartXRef.current = clientX
-    dragDeltaRef.current = 0
-    justDraggedRef.current = false
-
-    const onMove = (moveEvent: MouseEvent | TouchEvent) => {
-      const x = 'touches' in moveEvent ? (moveEvent as TouchEvent).touches[0].clientX : (moveEvent as MouseEvent).clientX
-      dragDeltaRef.current = x - dragStartXRef.current
-      if ('touches' in moveEvent) moveEvent.preventDefault()
-    }
-
-    const touchOpts = { passive: false as const }
-    const onEnd = () => {
-      document.removeEventListener('mousemove', onMove as EventListener)
-      document.removeEventListener('mouseup', onEnd)
-      document.removeEventListener('touchmove', onMove as EventListener)
-      document.removeEventListener('touchend', onEnd)
-      const threshold = 50
-      if (dragDeltaRef.current < -threshold) {
-        goNext()
-        justDraggedRef.current = true
-      } else if (dragDeltaRef.current > threshold) {
-        goPrev()
-        justDraggedRef.current = true
-      }
-      dragDeltaRef.current = 0
-      setTimeout(() => { justDraggedRef.current = false }, 150)
-    }
-
-    if ('touches' in e) {
-      document.addEventListener('touchmove', onMove as EventListener, touchOpts)
-      document.addEventListener('touchend', onEnd)
-    } else {
-      document.addEventListener('mousemove', onMove as EventListener)
-      document.addEventListener('mouseup', onEnd)
-    }
-  }
-
-  return (
-    <section id="instagram" className="instagram-feed-section">
-      <div className="instagram-feed-bg" aria-hidden="true" />
-      <div className="instagram-feed-inner">
-        <h2 className="instagram-feed-title">Follow us on Instagram</h2>
-        <a
-          href={INSTAGRAM_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="instagram-feed-handle"
-        >
-          @{INSTAGRAM_HANDLE}
-        </a>
-        <div className="instagram-feed-grid">
-          {INSTAGRAM_FEED_IMAGES.map((src, i) => (
-            <button
-              key={i}
-              type="button"
-              className="instagram-feed-item"
-              onClick={() => openLightbox(i)}
-              aria-label={`View image ${i + 1} of ${INSTAGRAM_FEED_IMAGES.length}`}
-            >
-              <img src={src} alt="" loading="lazy" />
-              <span className="instagram-feed-overlay" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                </svg>
-              </span>
-            </button>
-          ))}
-        </div>
-        <a
-          href={INSTAGRAM_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="instagram-feed-cta"
-        >
-          Follow @{INSTAGRAM_HANDLE}
-        </a>
-      </div>
-
-      {lightboxOpen && (
-        <div
-          className="instagram-lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Image gallery"
-          onClick={(e) => e.target === e.currentTarget && closeLightbox()}
-        >
-          <button
-            type="button"
-            className="instagram-lightbox-close"
-            onClick={closeLightbox}
-            aria-label="Close"
-          >
-            <span aria-hidden="true">×</span>
-          </button>
-          <button
-            type="button"
-            className="instagram-lightbox-prev"
-            onClick={(e) => { e.stopPropagation(); goPrev() }}
-            aria-label="Previous image"
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-          </button>
-          <div
-            className="instagram-lightbox-content"
-            onMouseDown={handleDragStart}
-            onTouchStart={handleDragStart}
-          >
-            <img
-              src={INSTAGRAM_FEED_IMAGES[lightboxIndex]}
-              alt=""
-              draggable={false}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-          <button
-            type="button"
-            className="instagram-lightbox-next"
-            onClick={(e) => { e.stopPropagation(); goNext() }}
-            aria-label="Next image"
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-          </button>
-          <p className="instagram-lightbox-counter">
-            {lightboxIndex + 1} / {INSTAGRAM_FEED_IMAGES.length}
-          </p>
-        </div>
-      )}
-    </section>
-  )
-}
-
-function ClosingBanner() {
-  return (
-    <section className="closing-banner">
-      <p>Where will Boston Jimmy take you, and what memories will you create?</p>
-    </section>
-  )
-}
-
 export default function Home() {
   const heroSectionRef = useRef<HTMLElement | null>(null)
   const [heroVisible, setHeroVisible] = useState(true)
@@ -1028,8 +834,6 @@ export default function Home() {
         </section>
         <FAQSection />
         <ContactSection />
-        <InstagramFeedSection />
-        <ClosingBanner />
       </main>
       <Footer />
     </>
