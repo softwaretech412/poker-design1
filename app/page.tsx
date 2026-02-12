@@ -189,7 +189,7 @@ type TopVideoProps = {
 
 function TopVideo({ sectionRef }: TopVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(true)
 
   useEffect(() => {
     const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`)
@@ -206,7 +206,7 @@ function TopVideo({ sectionRef }: TopVideoProps) {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            video.play().catch(() => {})
+            video.play().catch(() => { })
           } else {
             video.pause()
           }
@@ -429,7 +429,7 @@ function FirstImageVideo() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            video.play().catch(() => {})
+            video.play().catch(() => { })
           } else {
             video.pause()
           }
@@ -513,7 +513,7 @@ function ContactSection() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
-      
+
       if (!res.ok) throw new Error('Send failed')
       setSubmitStatus('success')
       setForm({ name: '', email: '', datesInVegas: '', highStakes: '', instagram: '', message: '' })
@@ -827,7 +827,7 @@ export default function Home() {
             <h2 className="section-title">Our Story</h2>
             <p className="section-text">
               This is an invite-only high-stakes cash game hosted in Las Vegas, built around deep stacks,
-              consistent lineups, and a professional environment. The game runs regularly and attracts experienced players, 
+              consistent lineups, and a professional environment. The game runs regularly and attracts experienced players,
               business professionals, and international action looking for real stakes and real poker.
             </p>
           </div>
